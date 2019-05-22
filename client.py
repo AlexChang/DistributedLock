@@ -1,13 +1,18 @@
 import utils as F
 
+import logging
+
+logger = logging.getLogger('main' + '.' + __name__)
+
 class Client:
 
-    def __init__(self):
-        self.uuid = F.generate_uuid()
+    def __init__(self, ip):
+        self.ip = ip
+        self.uuid = F.generate_uuid_by_ip(self.ip)
         self.server = None
 
     def __str__(self):
-        description = "Client: {}\nserver: {}\n".format(self.uuid, self.server.uuid)
+        description = "Client: {}\nip: {}\nserver: {}\n".format(self.uuid, self.ip, self.server.uuid)
         return description
 
     def update_corresponding_server(self, server):

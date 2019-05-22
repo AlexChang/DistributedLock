@@ -3,11 +3,19 @@ import parameter as P
 
 from client import Client
 from server import Server
+from leader import Leader
+from follower import Follower
+
+from faker import Faker
 
 def main():
+
+    fake = Faker()
+    fake.seed(1234)
+
     # init servers
-    leader = Server(is_leader=True)
-    followers = [Server() for x in range(P.follower_num)]
+    leader = Leader(fake.ipv4())
+    followers = [Follower(fake.ipv4()) for x in range(P.follower_num)]
     servers = [leader]
     servers.extend(followers)
 
@@ -15,10 +23,9 @@ def main():
     leader.add_followers(followers)
     for follower in followers:
         follower.add_leader(leader)
-        follower.add_followers([x for x in followers if x != follower])
 
     # init clients
-    clients = [Client() for x in range(P.client_num)]
+    clients = [Client(fake.ipv4()) for x in range(P.client_num)]
 
     # config client
     for idx, client in enumerate(clients):
