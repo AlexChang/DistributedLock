@@ -97,3 +97,4 @@ ENV/
 *.t7
 
 # self define
+*.log

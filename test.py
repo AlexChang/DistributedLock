@@ -13,6 +13,8 @@ class Master:
         return description
 
     def op(self, slave_id, msg):
+        p2 = multiprocessing.Process(target=self.slaves[0].op, args=('Hello World!',))
+        p2.start()
         connection = self.connection_to_slaves[slave_id]
         connection.send(self.lock)
         print(connection.recv())
@@ -45,10 +47,8 @@ def main():
         s.connection_to_master = conn2
 
     p1 = multiprocessing.Process(target=m.op, args=(0, 'Hello'))
-    p2 = multiprocessing.Process(target=s_list[0].op, args=('Hello World!',))
 
     p1.start()
-    p2.start()
 
     print(m)
     for s in s_list:

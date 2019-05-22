@@ -1,5 +1,6 @@
 import utils as F
 
+import multiprocessing
 import logging
 
 logger = logging.getLogger('main' + '.' + __name__)
@@ -11,7 +12,8 @@ class Follower:
         self.uuid = F.generate_uuid_by_ip(self.ip)
         self.lock_map = {}
         self.leader = None
-        self.connection_to_master = None
+        self.connection_to_leader = None
+        self.connection_to_client = None
 
     def __str__(self):
         description = "Follower server: {}\n".format(self.uuid)

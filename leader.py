@@ -1,6 +1,6 @@
 import utils as F
-import multiprocessing
 
+import multiprocessing
 import logging
 
 logger = logging.getLogger('main' + '.' + __name__)
@@ -13,6 +13,7 @@ class Leader:
         self.lock_map = {}
         self.followers = []
         self.connections_to_followers = []
+        self.connection_to_client = None
 
     def __str__(self):
         description = "Leader server: {}\n".format(self.uuid)
@@ -27,14 +28,11 @@ class Leader:
                 self.uuid, self.ip, follower.uuid, follower.ip))
             conn1, conn2 = multiprocessing.Pipe()
             self.connections_to_followers.append(conn1)
-            follower.connection_to_master = conn2
-            logger.info('Establishment process done!')
+            follower.connection_to_leader = conn2
+            logger.info('Connection establishment completed!')
 
     def update_lock_map(self, lock_map):
         self.lock_map = lock_map
-
-    def add_follower(self, follower):
-        self.followers.append(follower)
 
     def add_followers(self, followers):
         self.followers.extend(followers)
@@ -48,7 +46,7 @@ class Leader:
             return False
 
     def preempt_lock(self, lock_key, client_id):
-        print('Server {}'.format(self.uuid))
+        logger.info('Server {}({})'.format(self.uuid, self.ip))
         print('performing operation "preempt_lock", lock_key="{}", client_id="{}"'.format(lock_key, client_id))
         if lock_key not in self.lock_map:
             self.lock_map[lock_key] = client_id

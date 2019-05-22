@@ -1,5 +1,11 @@
+import parameter as P
+
 import uuid
 import random
+import os
+import logging
+
+logger = logging.getLogger('main' + '.' + __name__)
 
 
 def generate_uuid():
@@ -21,3 +27,11 @@ def rand_item(my_list):
 def rand_int(my_range):
     """int in [my_range[0], my_range[1]]"""
     return random.randint(my_range[0], my_range[1])
+
+
+def check_path_validity():
+    logger.info("Checking path validity...")
+    if not os.path.exists(P.log_path):
+        logger.info("Directory {} does not exist, creating...".format(P.log_path))
+        os.makedirs(P.log_path)
+    logger.info("Check path validation process done!")

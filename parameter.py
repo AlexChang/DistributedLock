@@ -2,6 +2,8 @@ follower_num = 2
 client_num = follower_num + 1
 exp_num = 10
 
+log_path = './log/'
+
 # client operations
 client_operation_range = (100, 102)
 
