@@ -1,5 +1,8 @@
 import utils as F
 import multiprocessing
+import socket
+import threading
+import time
 
 class Master:
     def __init__(self):
@@ -33,26 +36,64 @@ class Slave:
         print(self.connection_to_master.recv())
         self.connection_to_master.send(msg)
 
+def f(a, b):
+    print(__name__)
+    print(a)
+    print(b)
+
+class Test:
+
+    mutex = threading.Lock()
+
+    def __init__(self):
+        self.l = []
+        # self.mutex = threading.Lock()
+
+    def f(self):
+        # mutex = threading.Lock()
+        for i in range(20):
+            t = threading.Thread(target=self.g, args=(i, ))
+            t.start()
+
+    def g(self, n):
+        time.sleep(1)
+        self.mutex.acquire()
+        self.l.append(n*n)
+        print(self.l)
+        self.mutex.release()
+
 
 def main():
-    m = Master()
-    s_list = [Slave() for i in range(2)]
-    m.slaves.extend(s_list)
-    for s in s_list:
-        s.master = m
+    # m = Master()
+    # s_list = [Slave() for i in range(2)]
+    # m.slaves.extend(s_list)
+    # for s in s_list:
+    #     s.master = m
+    #
+    # for s in m.slaves:
+    #     conn1, conn2 = multiprocessing.Pipe()
+    #     m.connection_to_slaves.append(conn1)
+    #     s.connection_to_master = conn2
+    #
+    # p1 = multiprocessing.Process(target=m.op, args=(0, 'Hello'))
+    #
+    # p1.start()
+    #
+    # print(m)
+    # for s in s_list:
+    #     print(s)
 
-    for s in m.slaves:
-        conn1, conn2 = multiprocessing.Pipe()
-        m.connection_to_slaves.append(conn1)
-        s.connection_to_master = conn2
+    t = Test()
+    multiprocessing.Process(target=t.f).start()
+    # t.f()
 
-    p1 = multiprocessing.Process(target=m.op, args=(0, 'Hello'))
+    dict = {'a': 123, 'b': 456}
+    f(**{'a': 123, 'b': 456})
 
-    p1.start()
+    print(F.generate_uuid()[:8])
 
-    print(m)
-    for s in s_list:
-        print(s)
+
+
     return
 
 if __name__ == '__main__':

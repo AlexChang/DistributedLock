@@ -6,17 +6,23 @@ import os
 import logging
 
 logger = logging.getLogger('main' + '.' + __name__)
+random.seed(1)
 
 
 def generate_uuid():
-    return str(uuid.uuid4())
+    return str(uuid.UUID(int=random.getrandbits(128)))
 
 
-def generate_uuid_by_ip(ip, namespace=uuid.NAMESPACE_OID):
+def generate_uuid_by_addr(addr, namespace=uuid.NAMESPACE_OID):
     if namespace:
-        return str(uuid.uuid5(namespace, ip))
+        return str(uuid.uuid5(namespace, addr))
     else:
-        return str(uuid.uuid5(uuid.NAMESPACE_OID, ip))
+        return str(uuid.uuid5(uuid.NAMESPACE_OID, addr))
+
+
+def rand_int(my_range):
+    """int in [my_range[0], my_range[1]]"""
+    return random.randint(my_range[0], my_range[1])
 
 
 def rand_item(my_list):
@@ -24,9 +30,14 @@ def rand_item(my_list):
     return random.choice(my_list)
 
 
-def rand_int(my_range):
-    """int in [my_range[0], my_range[1]]"""
-    return random.randint(my_range[0], my_range[1])
+def rand_items_in_range(num, my_range):
+    """generate num items in [my_range[0], my_range[1]]"""
+    items = []
+    while len(items) != num:
+        item = rand_int(my_range)
+        if item not in items:
+            items.append(item)
+    return items
 
 
 def check_path_validity():
