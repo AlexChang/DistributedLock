@@ -1,17 +1,17 @@
 import utils as F
 import parameter as P
-import RWLock
+import const as C
 
-import socket
-import multiprocessing
-import logging
 import json
+import socket
+import logging
 
 logger = logging.getLogger('main' + '.' + __name__)
 
+
 class Client:
 
-    def __init__(self, ip=P.LOCALHOST):
+    def __init__(self, ip=C.LOCALHOST):
         self.ip = ip
         self.uuid = F.generate_uuid()
         self.server = None

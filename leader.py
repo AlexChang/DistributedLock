@@ -1,20 +1,20 @@
 import utils as F
 import parameter as P
+import const as C
 import RWLock
 
 import json
 import socket
-import multiprocessing
 import threading
 import logging
 import select
 
 logger = logging.getLogger('main' + '.' + __name__)
 
+
 class Leader:
 
-
-    def __init__(self, port, ip=P.LOCALHOST):
+    def __init__(self, port, ip=C.LOCALHOST):
         self.ip = ip
         self.port = port
         self.uuid = F.generate_uuid_by_addr(self.get_addr())
@@ -23,6 +23,8 @@ class Leader:
         self.stop_server = False
         self.mutex = threading.Lock()
         self.rwlock = RWLock.RWLock()
+        self.lock_type = P.lock_type
+        self.consensus_type = P.consensus_type
 
     def get_addr(self):
         return '{}:{}'.format(self.ip, self.port)
@@ -76,7 +78,7 @@ class Leader:
 
     def handle_client_request(self, op, args):
         if op == 'try_lock':
-            if P.lock_type == P.RWLOCK:
+            if self.lock_type == C.RWLOCK:
                 self.rwlock.write_acquire()
                 logger.debug('Server {} acquires write lock when handling client request {}'.format(
                     self.get_short_uuid(), op))
@@ -93,7 +95,7 @@ class Leader:
                     self.get_short_uuid(), op))
                 self.mutex.release()
         elif op == 'try_unlock':
-            if P.lock_type == P.RWLOCK:
+            if self.lock_type == C.RWLOCK:
                 self.rwlock.write_acquire()
                 logger.debug('Server {} acquires write lock when handling client request {}'.format(
                     self.get_short_uuid(), op))
@@ -110,7 +112,7 @@ class Leader:
                     self.get_short_uuid(), op))
                 self.mutex.release()
         elif op == 'own_the_lock':
-            if P.lock_type == P.RWLOCK:
+            if self.lock_type == C.RWLOCK:
                 self.rwlock.read_acquire()
                 logger.debug('Server {} acquires read lock when handling client request {}'.format(
                     self.get_short_uuid(), op))
@@ -127,7 +129,7 @@ class Leader:
 
     def handle_server_request(self, op, args):
         if op == 'preempt_lock':
-            if P.lock_type == P.RWLOCK:
+            if self.lock_type == C.RWLOCK:
                 self.rwlock.write_acquire()
                 logger.debug('Leader {} acquires write lock when handling follower request {}'.format(
                     self.get_short_uuid(), op))
@@ -144,7 +146,7 @@ class Leader:
                     self.get_short_uuid(), op))
                 self.mutex.release()
         elif op == 'release_lock':
-            if P.lock_type == P.RWLOCK:
+            if self.lock_type == C.RWLOCK:
                 self.rwlock.write_acquire()
                 logger.debug('Leader {} acquires write lock when handling follower request {}'.format(
                     self.get_short_uuid(), op))
@@ -178,9 +180,15 @@ class Leader:
             self.get_short_uuid(), lock_key, client_id))
         if lock_key not in self.lock_map:
             self.lock_map[lock_key] = client_id
+            request_thread_list = []
             for follower in self.followers:
-                threading.Thread(target=self.request_to_update, args=(
-                    follower.ip, follower.port, follower.get_short_uuid())).start()
+                req_thread = threading.Thread(target=self.request_to_update, args=(
+                    follower.ip, follower.port, follower.get_short_uuid()))
+                request_thread_list.append(req_thread)
+                req_thread.start()
+            if self.consensus_type == C.STRONG:
+                for req_thread in request_thread_list:
+                    req_thread.join()
             return True
         else:
             return False
@@ -190,9 +198,15 @@ class Leader:
             self.get_short_uuid(), lock_key, client_id))
         if self.check_lock(lock_key, client_id):
             del self.lock_map[lock_key]
+            request_thread_list = []
             for follower in self.followers:
-                threading.Thread(target=self.request_to_update, args=(
-                    follower.ip, follower.port, follower.get_short_uuid())).start()
+                req_thread = threading.Thread(target=self.request_to_update, args=(
+                    follower.ip, follower.port, follower.get_short_uuid()))
+                request_thread_list.append(req_thread)
+                req_thread.start()
+            if self.consensus_type == C.STRONG:
+                for req_thread in request_thread_list:
+                    req_thread.join()
             return True
         else:
             return False
@@ -211,7 +225,3 @@ class Leader:
 
         logger.debug('Leader {} request follower {} to update lock map result: {}'.format(
             self.get_short_uuid(), follower_uuid, received_data))
-
-
-
-

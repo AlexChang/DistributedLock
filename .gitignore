@@ -98,3 +98,4 @@ ENV/
 
 # self define
 *.log
+*.json

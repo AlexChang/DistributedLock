@@ -1,20 +1,20 @@
 import utils as F
 import parameter as P
+import const as C
 import RWLock
 
+import json
 import socket
-import multiprocessing
 import threading
 import logging
-import json
 import select
 
 logger = logging.getLogger('main' + '.' + __name__)
 
+
 class Follower:
 
-
-    def __init__(self, port, ip=P.LOCALHOST):
+    def __init__(self, port, ip=C.LOCALHOST):
         self.ip = ip
         self.port = port
         self.uuid = F.generate_uuid_by_addr(self.get_addr())
@@ -23,6 +23,8 @@ class Follower:
         self.stop_server = False
         self.mutex = threading.Lock()
         self.rwlock = RWLock.RWLock()
+        self.lock_type = P.lock_type
+        self.consensus_type = P.consensus_type
 
     def get_addr(self):
         return '{}:{}'.format(self.ip, self.port)
@@ -73,7 +75,7 @@ class Follower:
 
     def handle_client_request(self, op, kwargs):
         if op == 'try_lock':
-            if P.lock_type == P.RWLOCK:
+            if self.lock_type == C.RWLOCK:
                 # self.rwlock.write_acquire()
                 # logger.debug('Server {} acquires write lock when handling client request {}'.format(
                 #     self.get_short_uuid(), op))
@@ -90,7 +92,7 @@ class Follower:
                 #     self.get_short_uuid(), op))
                 # self.mutex.release()
         elif op == 'try_unlock':
-            if P.lock_type == P.RWLOCK:
+            if self.lock_type == C.RWLOCK:
                 # self.rwlock.write_acquire()
                 # logger.debug('Server {} acquires write lock when handling client request {}'.format(
                 #     self.get_short_uuid(), op))
@@ -107,7 +109,7 @@ class Follower:
                 #     self.get_short_uuid(), op))
                 # self.mutex.release()
         elif op == 'own_the_lock':
-            if P.lock_type == P.RWLOCK:
+            if self.lock_type == C.RWLOCK:
                 self.rwlock.read_acquire()
                 logger.debug('Server {} acquires read lock when handling client request {}'.format(
                     self.get_short_uuid(), op))
@@ -124,7 +126,7 @@ class Follower:
 
     def handle_server_request(self, op, args):
         if op == 'request_to_update':
-            if P.lock_type == P.RWLOCK:
+            if self.lock_type == C.RWLOCK:
                 self.rwlock.write_acquire()
                 logger.debug('Follower {} acquires write lock when handling leader request {}'.format(
                     self.get_short_uuid(), op))

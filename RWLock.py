@@ -79,11 +79,11 @@ class RWLock(object):
     read_release = unlock
     write_release = unlock
 
+
 if __name__ == '__main__':
     import time
 
     rwl = RWLock()
-
 
     class Writer(threading.Thread):
         def run(self):
@@ -103,7 +103,6 @@ if __name__ == '__main__':
             print(self, 'stop')
             rwl.read_release()
 
-
     class Reader1(threading.Thread):
         def run(self):
             print(self, 'start')
@@ -112,7 +111,6 @@ if __name__ == '__main__':
             time.sleep(3)
             print(self, 'stop')
             rwl.read_release()
-
 
     class Writer1(threading.Thread):
         def run(self):

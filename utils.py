@@ -4,9 +4,10 @@ import uuid
 import random
 import os
 import logging
+import json
 
 logger = logging.getLogger('main' + '.' + __name__)
-random.seed(1)
+# random.seed(1)
 
 
 def generate_uuid():
@@ -46,3 +47,12 @@ def check_path_validity():
         logger.info("Directory {} does not exist, creating...".format(P.log_path))
         os.makedirs(P.log_path)
     logger.info("Check path validation process done!")
+
+def save_parameter(filename='parameter', time_suffix=''):
+    d = dict((name, getattr(P, name)) for name in dir(P) if not name.startswith('__'))
+    del d['C']
+    file_full_name = P.log_path + filename + '_' + time_suffix + '.json'
+    logger.debug("Parameter: {}".format(d))
+    logger.info("Saving parameter to file '{}'...".format(file_full_name))
+    json.dump(d, open(file_full_name, 'w'))
+    logger.info("Parameter saving process done!")

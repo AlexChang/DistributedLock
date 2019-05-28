@@ -1,4 +1,5 @@
 import utils as F
+import parameter as P
 import multiprocessing
 import socket
 import threading
@@ -92,7 +93,7 @@ def main():
 
     print(F.generate_uuid()[:8])
 
-
+    print(vars(P))
 
     return
 
