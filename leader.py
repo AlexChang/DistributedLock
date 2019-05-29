@@ -1,7 +1,7 @@
 import utils as F
 import parameter as P
 import const as C
-import RWLock
+import rw_lock
 
 import json
 import socket
@@ -22,7 +22,7 @@ class Leader:
         self.followers = []
         self.stop_server = False
         self.mutex = threading.Lock()
-        self.rwlock = RWLock.RWLock()
+        self.rwlock = rw_lock.RWLock()
         self.lock_type = P.lock_type
         self.consensus_type = P.consensus_type
 
