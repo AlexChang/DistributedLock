@@ -79,6 +79,7 @@ def main():
             threading.Thread(target=follower.init_server).start()
 
     # init clients
+    time.sleep(0.1)
     clients = []
     for i in range(P.client_num):
         client = Client()
@@ -97,7 +98,7 @@ def main():
         t = threading.Thread(target=func, args=(F.rand_item(lock_keys),))
         thread_list.append(t)
         t.start()
-        time.sleep(0.01)
+        time.sleep(0.1)
 
     # join client requests
     for t in thread_list:
