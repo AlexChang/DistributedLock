@@ -114,7 +114,7 @@ class Follower:
                 logger.debug('Server {} acquires read lock when handling client request {}'.format(
                     self.get_short_uuid(), op))
                 result = self.check_lock(**kwargs)
-                logger.debug('Server {} acquires read lock when handling client request {}'.format(
+                logger.debug('Server {} releases read lock after handling client request {}'.format(
                     self.get_short_uuid(), op))
                 self.rwlock.read_release()
             else:
@@ -150,7 +150,7 @@ class Follower:
     def check_lock(self, lock_key, client_id):
         logger.debug('Server {} performing operation "check_lock", lock_key="{}", client_id="{}"'.format(
             self.get_short_uuid(), lock_key, client_id))
-        if lock_key in self.lock_map:
+        if lock_key in self.lock_map.keys():
             return self.lock_map[lock_key] == client_id
         else:
             return False

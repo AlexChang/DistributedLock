@@ -48,6 +48,7 @@ def check_path_validity():
         os.makedirs(P.log_path)
     logger.info("Check path validation process done!")
 
+
 def save_parameter(filename='parameter', time_suffix=''):
     d = dict((name, getattr(P, name)) for name in dir(P) if not name.startswith('__'))
     del d['C']

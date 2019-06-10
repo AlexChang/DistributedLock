@@ -170,7 +170,7 @@ class Leader:
     def check_lock(self, lock_key, client_id):
         logger.debug('Server {} performing operation "check_lock", lock_key="{}", client_id="{}"'.format(
             self.get_short_uuid(), lock_key, client_id))
-        if lock_key in self.lock_map:
+        if lock_key in self.lock_map.keys():
             return self.lock_map[lock_key] == client_id
         else:
             return False
@@ -178,7 +178,7 @@ class Leader:
     def preempt_lock(self, lock_key, client_id):
         logger.debug('Server {} performing operation "preempt_lock", lock_key="{}", client_id="{}"'.format(
             self.get_short_uuid(), lock_key, client_id))
-        if lock_key not in self.lock_map:
+        if lock_key not in self.lock_map.keys():
             self.lock_map[lock_key] = client_id
             request_thread_list = []
             for follower in self.followers:

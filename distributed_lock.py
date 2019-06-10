@@ -26,6 +26,7 @@ def init_arg_parser():
     args = parser.parse_args()
     return args
 
+
 def init_logger(algo='DistributedLock', time_suffix=''):
     logger = logging.getLogger('main')
     logger.setLevel(logging.DEBUG)
@@ -95,10 +96,10 @@ def main():
         operation_code = F.rand_int(P.client_operation_range)
         operation_name = C.OPERATION_MAPPING[operation_code]
         func = getattr(client, operation_name)
-        t = threading.Thread(target=func, args=(F.rand_item(lock_keys),))
+        t = threading.Thread(target=func, args=(str(F.rand_item(lock_keys)),))
         thread_list.append(t)
         t.start()
-        time.sleep(0.1)
+        time.sleep(0.015)
 
     # join client requests
     for t in thread_list:
