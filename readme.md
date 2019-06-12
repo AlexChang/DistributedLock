@@ -43,18 +43,26 @@ server
 
 ![Data structure](./img/project2_pic2.png)
 
-## Implementation
+## Project Structure
 
-### Core
+### Core files
 
-* client
+* client.py
+    * defines the client class
 * leader
+    * defines the leader server class
 * follower
+    * defines the follower server class
 * rw_lock
+    * defines the readers-writer lock
 * distributed_lock
+    * defines the main function, **run this file** to see the simulation results, more detailed simulation results are stored in file ```DistributedLock_detail_<time_suffix>.log``` under directory ```log/```.
 
-### Auxiliary
+### Auxiliary files
 
 * utils
+    * defines some auxiliary functions
 * const
+    * defines some constants
 * parameter
+    * defines some variable parameters
